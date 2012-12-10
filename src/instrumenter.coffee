@@ -69,19 +69,50 @@ class Instrumenter extends istanbul.Instrumenter
         @getPreamble(code) + '\n' + escodegen.generate(program, codegenOptions) + '\n'
 
     attachLocation: (tree)->
+        # TODO(Constellation)
+        # calculate precise offset or attach in
+        # CoffeeScriptRedux compiler
         estraverse.traverse tree,
-            enter: (node, parent) ->
-                if node.column? and node.line? and node.raw?
-                    # TODO(Constellation)
-                    # calculate precise offset or attach in
-                    # CoffeeScriptRedux compiler
+            leave: (node, parent) ->
+                if node.column? and node.line? and (node.raw? or node.value?)
+                    value = node.raw or node.value
                     node.loc =
-                        start: { line: node.line, column: node.column },
-                        end: { line: node.line, column: node.column + node.raw.length }
-                    lines = node.raw.split(/(?:\n|\r|[\r\n])/)
+                        start: { line: node.line, column: node.column }
+                        end: { line: node.line, column: 0 }
+                    node.loc.start.column -= 2
+                    node.loc.end.column = node.loc.start.column + value.length
+                    lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
                         node.loc.end.line += lines.lines
-                        node.loc.end.column = lines[lines.length - 1].length
+                        node.loc.end.column = lines[lines.length - 2].length
+                else
+                    try
+                        switch node.type
+                            when 'BlockStatement'
+                                node.loc =
+                                    start: node.body[0].loc.start
+                                    end: node.body[node.body.length - 1].loc.end
+                            when 'VariableDeclarator'
+                                if node?.init?.loc?
+                                    node.loc =
+                                        start: node.id.loc.start
+                                        end: node.init.loc.end
+                                else
+                                    node.loc = node.id.loc
+                            when 'ExpressionStatement'
+                                node.loc = node.expression.loc
+                            when 'ReturnStatement'
+                                node.loc = node.argument.loc
+                            when 'VariableDeclaration'
+                                node.loc =
+                                    start: node.declarations[0].loc.start
+                                    end: node.declarations[node.declarations.length - 1].loc.end
+                            else
+                                throw 'out'
+                    catch e
+                        node.loc =
+                            start: { line: 0, column: 0 }
+                            end: { line: 0, column: 0 }
 
 module.exports = Instrumenter
 # vim: set sw=4 ts=4 et tw=80 :
