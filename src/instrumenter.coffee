@@ -84,7 +84,7 @@ class Instrumenter extends istanbul.Instrumenter
                     lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
                         node.loc.end.line += lines.lines
-                        node.loc.end.column = lines[lines.length - 2].length
+                        node.loc.end.column = lines[lines.length - 1].length
                 else
                     try
                         switch node.type
