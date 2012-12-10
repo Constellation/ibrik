@@ -75,11 +75,16 @@ class Instrumenter extends istanbul.Instrumenter
         estraverse.traverse tree,
             leave: (node, parent) ->
                 if node.column? and node.line? and (node.raw? or node.value?)
-                    value = node.raw or node.value
+                    if node.raw?
+                        value = node.raw
+                    else if typeof node.value is 'string'
+                        value = '"' + node.value + '"'
+                    else
+                        value = '' + node.value
                     node.loc =
                         start: { line: node.line, column: node.column }
                         end: { line: node.line, column: 0 }
-                    node.loc.start.column -= 2
+                    # node.loc.start.column -= 2
                     node.loc.end.column = node.loc.start.column + value.length
                     lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
