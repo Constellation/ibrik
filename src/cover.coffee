@@ -36,7 +36,7 @@ existsSync = fs.existsSync or path.existsSync
 
 DEFAULT_REPORT_FORMAT = 'lcov'
 
-main = (opts, callback) ->
+module.exports = (opts, callback) ->
     cmd = opts._[0]
     file = opts._[1]
     args = opts._.slice 2
@@ -114,5 +114,4 @@ main = (opts, callback) ->
 
         runFn()
 
-module.exports = main
 # vim: set sw=4 ts=4 et tw=80 :

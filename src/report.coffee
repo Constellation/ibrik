@@ -20,28 +20,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-fs = require 'fs'
-optimist = require 'optimist'
+istanbul = require 'istanbul'
 
-argv = optimist.usage('''
-Usage: $0 subcommand
-=== subcommands ===
-    cover
-''').argv
+module.exports = (argv) ->
 
-if not argv._[0]?
-    optimist.showHelp()
-    process.exit 1
-
-switch argv._[0]
-    when 'cover' then require('./cover') argv, (err) ->
-        if err
-            console.error err
-            process.exit 1
-        process.exit 0
-    when 'report' then require('./report') argv, (err) ->
-        if err
-            console.error err
-            process.exit 1
-        process.exit 0
 # vim: set sw=4 ts=4 et tw=80 :
