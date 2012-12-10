@@ -38,6 +38,5 @@ switch argv._[0]
         if err
             console.error err
             process.exit 1
-        console.log "done"
         process.exit 0
 # vim: set sw=4 ts=4 et tw=80 :

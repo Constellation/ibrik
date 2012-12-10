@@ -26,7 +26,6 @@ istanbul = require 'istanbul'
 coffee = require 'CoffeeScriptRedux'
 
 originalLoader = require.extensions['.coffee']
-console.log originalLoader.toString()
 
 hook = Object.create istanbul.hook
 
