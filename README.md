@@ -14,9 +14,14 @@ ibrik can be used in in a Node.js application via the package manager:
 
 ### Usage
 
-### License
+like this
+```sh
+ibrik cover script.coffee
+istanbul report html
+open coverage/index.html
+```
 
-#### ibrik
+### License
 
 Copyright (C) 2012 [Yusuke Suzuki](http://github.com/Constellation)
  (twitter: [@Constellation](http://twitter.com/Constellation)) and other contributors.
