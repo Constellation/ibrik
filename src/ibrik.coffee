@@ -22,4 +22,5 @@
 
 exports.Instrumenter = require './instrumenter'
 exports.hook = require './hook'
+exports.version = '0.0.2-dev'
 # vim: set sw=4 ts=4 et tw=80 :
