@@ -1,0 +1,45 @@
+{
+    "name": "ibrik",
+    "description": "CoffeeScript coverage tool",
+    "homepage": "http://github.com/Constellation/ibrik.html",
+    "main": "./lib/ibrik",
+    "directories": {
+        "lib": "./lib"
+    },
+    "bin": {
+        "ibrik": "./bin/ibrik.js"
+    },
+    "version": "0.0.1-dev",
+    "engines": {
+        "node": ">=0.4.0"
+    },
+    "maintainers": [{
+        "name": "Yusuke Suzuki",
+        "email": "utatane.tea@gmail.com",
+        "web": "http://github.com/Constellation"
+    }],
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/Constellation/ibrik.git"
+    },
+    "dependencies": {
+        "CoffeeScriptRedux": "git+https://github.com/michaelficarra/CoffeeScriptRedux.git",
+        "istanbul": "*",
+        "optimist": "*",
+        "escodegen": "*",
+        "mkdirp": "*",
+        "which": "*",
+        "estraverse": "*"
+    },
+    "devDependencies": {
+        "mocha": "*",
+        "chai": "*"
+    },
+    "licenses": [{
+        "type": "BSD",
+        "url": "http://github.com/Constellation/ibrik/raw/master/LICENSE.BSD"
+    }],
+    "scripts": {
+        "test": "./node_modules/.bin/mocha"
+    }
+}
