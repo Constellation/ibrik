@@ -84,11 +84,10 @@ class Instrumenter extends istanbul.Instrumenter
                     node.loc =
                         start: { line: node.line, column: node.column }
                         end: { line: node.line, column: 0 }
-                    # node.loc.start.column -= 2
                     node.loc.end.column = node.loc.start.column + value.length
                     lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
-                        node.loc.end.line += lines.lines
+                        node.loc.end.line += (lines.length - 1)
                         node.loc.end.column = lines[lines.length - 1].length
                 else
                     try
@@ -107,7 +106,7 @@ class Instrumenter extends istanbul.Instrumenter
                             when 'ExpressionStatement'
                                 node.loc = node.expression.loc
                             when 'ReturnStatement'
-                                node.loc = node.argument.loc
+                                node.loc = node.argument.loc if node.argument?
                             when 'VariableDeclaration'
                                 node.loc =
                                     start: node.declarations[0].loc.start
