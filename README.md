@@ -2,7 +2,7 @@
 
 Ibrik ([ibrik](http://github.com/Constellation/ibrik)) is
 code coverage tool for CoffeeScript.
-It uses istanbul and CoffeeScriptRedux compiler. Internally, it uses Mozilla JS AST as its IR.
+It uses [istanbul](https://github.com/gotwarlost/istanbul) and [CoffeeScriptRedux compiler](https://github.com/michaelficarra/CoffeeScriptRedux). Internally, it uses Mozilla JS AST as its IR.
 
 
 ### Install
