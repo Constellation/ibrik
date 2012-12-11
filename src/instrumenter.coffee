@@ -84,6 +84,9 @@ class Instrumenter extends istanbul.Instrumenter
                     node.loc =
                         start: { line: node.line, column: node.column }
                         end: { line: node.line, column: 0 }
+                    # FIXME(Constellation)
+                    # Is this bug?
+                    node.loc.start.column -= 2
                     node.loc.end.column = node.loc.start.column + value.length
                     lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
@@ -117,6 +120,7 @@ class Instrumenter extends istanbul.Instrumenter
                         node.loc =
                             start: { line: 0, column: 0 }
                             end: { line: 0, column: 0 }
+                return undefined
 
 module.exports = Instrumenter
 
