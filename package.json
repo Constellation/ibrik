@@ -23,7 +23,7 @@
         "url": "http://github.com/Constellation/ibrik.git"
     },
     "dependencies": {
-        "CoffeeScriptRedux": "git://github.com/michaelficarra/CoffeeScriptRedux.git#46e88ab65bde632d37cac02e75354abbb5f0ff87",
+        "CoffeeScriptRedux": "git://github.com/michaelficarra/CoffeeScriptRedux.git#e0ef5f440fe7918186bc4a703d1c69eafed2a828",
         "istanbul": "*",
         "optimist": "*",
         "escodegen": "*",

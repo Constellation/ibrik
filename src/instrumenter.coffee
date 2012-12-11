@@ -60,8 +60,8 @@ class Instrumenter extends istanbul.Instrumenter
 
         code = '//' + code if code[0] is '#'
 
-        csast = coffee.parse code, optimise:no
-        program = coffee.compile csast, bare:yes
+        csast = coffee.parse code, optimise: no, raw: yes
+        program = coffee.compile csast, bare: yes
         @attachLocation program
 
         @walker.startWalk program
@@ -119,4 +119,5 @@ class Instrumenter extends istanbul.Instrumenter
                             end: { line: 0, column: 0 }
 
 module.exports = Instrumenter
+
 # vim: set sw=4 ts=4 et tw=80 :
