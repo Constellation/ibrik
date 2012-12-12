@@ -35,6 +35,17 @@ generateTrackerVar = (filename, omitSuffix) ->
     suffix = suffix.replace(/\=/g, '').replace(/\+/g, '_').replace(/\//g, '$')
     '__cov_' + suffix
 
+# TODO(Constellation)
+# fix CoffeeScriptRedux compiler
+# https://github.com/michaelficarra/CoffeeScriptRedux/issues/117
+removeIndent = (code) ->
+    code.replace /[\uEFEF\uEFFE\uEFFF]/, ''
+
+calculateColumn = (raw, offset) ->
+    code = raw.substring 0, offset
+    lines = code.split(/(?:\n|\r|[\r\n])/)
+    removeIndent(lines[lines.length - 1]).length
+
 class Instrumenter extends istanbul.Instrumenter
     constructor: (opt) -> istanbul.Instrumenter.call(this, opt)
 
@@ -68,30 +79,29 @@ class Instrumenter extends istanbul.Instrumenter
         codegenOptions = @opts.codeGenerationOptions || { format: { compact: !this.opts.noCompact }}
         @getPreamble(code) + '\n' + escodegen.generate(program, codegenOptions) + '\n'
 
-    attachLocation: (tree)->
+    attachLocation: (program)->
         # TODO(Constellation)
         # calculate precise offset or attach in
         # CoffeeScriptRedux compiler
-        estraverse.traverse tree,
+        estraverse.traverse program,
             leave: (node, parent) ->
-                if node.column? and node.line? and (node.raw? or node.value?)
+                if node.offset? and (node.raw? or node.value?)
                     if node.raw?
                         value = node.raw
                     else if typeof node.value is 'string'
                         value = '"' + node.value + '"'
                     else
                         value = '' + node.value
+
+                    # calculate start line & column
                     node.loc =
-                        start: { line: node.line, column: node.column }
+                        start: { line: node.line, column: calculateColumn(program.raw, node.offset) }
                         end: { line: node.line, column: 0 }
-                    # FIXME(Constellation)
-                    # Is this bug?
-                    node.loc.start.column -= 2
                     node.loc.end.column = node.loc.start.column + value.length
                     lines = value.split(/(?:\n|\r|[\r\n])/)
                     if lines.length isnt 0 and lines.length isnt 1
                         node.loc.end.line += (lines.length - 1)
-                        node.loc.end.column = lines[lines.length - 1].length
+                        node.loc.end.column = removeIndent(lines[lines.length - 1]).length
                 else
                     try
                         switch node.type
