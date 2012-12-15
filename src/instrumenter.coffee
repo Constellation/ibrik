@@ -39,11 +39,11 @@ generateTrackerVar = (filename, omitSuffix) ->
 # fix CoffeeScriptRedux compiler
 # https://github.com/michaelficarra/CoffeeScriptRedux/issues/117
 removeIndent = (code) ->
-    code.replace /[\uEFEF\uEFFE\uEFFF]/, ''
+    code.replace /[\uEFEF\uEFFE\uEFFF]/g, ''
 
 calculateColumn = (raw, offset) ->
     code = raw.substring 0, offset
-    lines = code.split(/(?:\n|\r|[\r\n])/)
+    lines = code.split(/(?:\n|\r|[\r\n])/g)
     removeIndent(lines[lines.length - 1]).length
 
 class Instrumenter extends istanbul.Instrumenter
@@ -98,7 +98,7 @@ class Instrumenter extends istanbul.Instrumenter
                         start: { line: node.line, column: calculateColumn(program.raw, node.offset) }
                         end: { line: node.line, column: 0 }
                     node.loc.end.column = node.loc.start.column + value.length
-                    lines = value.split(/(?:\n|\r|[\r\n])/)
+                    lines = value.split(/(?:\n|\r|[\r\n])/g)
                     if lines.length isnt 0 and lines.length isnt 1
                         node.loc.end.line += (lines.length - 1)
                         node.loc.end.column = removeIndent(lines[lines.length - 1]).length
