@@ -37,81 +37,77 @@ existsSync = fs.existsSync or path.existsSync
 DEFAULT_REPORT_FORMAT = 'lcov'
 
 module.exports = (opts, callback) ->
-    cmd = opts._[0]
-    file = opts._[1]
-    args = opts._.slice 2
+    [cmd, file, args...] = opts._
 
-    return callback('Need a filename argument for the ' + cmd + ' command!') if not file
+    return callback "Need a filename argument for the #{cmd} command!" unless file
 
     if not existsSync file
         try file = which.sync file
         catch e
-            return callback 'Unable to resolve file [' + file + ']'
+            return callback "Unable to resolve file [#{file}]"
     else
         file = path.resolve file
 
     excludes = []
     if not opts['default-excludes']? or opts['default-excludes']
-        excludes = [ '**/node_modules/**', '**/test/**', '**/tests/**' ]
+        excludes = ['**/node_modules/**', '**/test/**', '**/tests/**']
 
     reportingDir = opts.dir or path.resolve process.cwd(), 'coverage'
 
-    mkdirp.sync(reportingDir)
+    mkdirp.sync reportingDir
 
-    reportClassName = opts.report || DEFAULT_REPORT_FORMAT
-    reports = []
-    reports.push istanbul.Report.create(reportClassName, dir: reportingDir)
+    reportClassName = opts.report or DEFAULT_REPORT_FORMAT
+    reports = [(istanbul.Report.create reportClassName, dir: reportingDir)]
 
     runFn = ->
-        process.argv = ["node", file].concat(args)
-        console.log('Running: ' + process.argv.join(' ')) if opts.verbose
+        process.argv = ['node', file, args...]
+        console.log "Running: #{process.argv.join ' '}" if opts.verbose
         process.env.running_under_istanbul = 1
         Module.runMain file, null, true
 
-    if opts.print isnt 'none'
+    unless opts.print is 'none'
         switch opts.print
-            when 'detail' then reports.push istanbul.Report.create('text')
+            when 'detail' then reports.push istanbul.Report.create 'text'
             when 'both'
-                reports.push istanbul.Report.create('text')
-                reports.push istanbul.Report.create('text-summary')
+                reports.push istanbul.Report.create 'text'
+                reports.push istanbul.Report.create 'text-summary'
             else
-                reports.push istanbul.Report.create('text-summary')
+                reports.push istanbul.Report.create 'text-summary'
 
     istanbul.matcherFor {
-        root: opts.root || process.cwd()
-        includes: [ '**/*.coffee' ]
-        excludes: excludes
+        root: opts.root or process.cwd()
+        includes: ['**/*.coffee']
+        excludes
     }, (err, matchFn) ->
-        return callback(err) if err
+        return callback err if err
 
-        coverageVar = '$$cov_' + Date.now() + '$$'
+        coverageVar = "$$cov_#{Date.now()}$$"
         instrumenter = new ibrik.Instrumenter coverageVariable: coverageVar
         transformer = instrumenter.instrumentSync.bind(instrumenter)
-        hookOpts =
-            verbose: opts.verbose
+        hookOpts = verbose: opts.verbose
 
-        ibrik.hook.unloadRequireCache(matchFn) if opts['self-test']
+        ibrik.hook.unloadRequireCache matchFn if opts['self-test']
 
-        ibrik.hook.hookRequire(matchFn, transformer, hookOpts)
+        ibrik.hook.hookRequire matchFn, transformer, hookOpts
 
         process.once 'exit', ->
-            file = path.resolve(reportingDir, 'coverage.json')
+            file = path.resolve reportingDir, 'coverage.json'
             if not global[coverageVar]?
-                return callback('No coverage information was collected, exit without writing coverage information')
+                return callback 'No coverage information was collected, exit without writing coverage information'
             else
                 cov = global[coverageVar]
 
             mkdirp.sync reportingDir
             console.log '============================================================================='
-            console.log 'Writing coverage object [' + file + ']'
-            fs.writeFileSync file, JSON.stringify(cov), 'utf8'
+            console.log "Writing coverage object [#{file}]"
+            fs.writeFileSync file, (JSON.stringify cov), 'utf8'
             collector = new istanbul.Collector
             collector.add cov
-            console.log 'Writing coverage reports at [' + reportingDir + ']'
+            console.log "Writing coverage reports at [#{reportingDir}]"
             console.log '============================================================================='
-            reports.forEach (report) -> report.writeReport(collector, yes)
+            report.writeReport collector, yes for report in reports
             return callback()
 
-        runFn()
+        do runFn
 
 # vim: set sw=4 ts=4 et tw=80 :
