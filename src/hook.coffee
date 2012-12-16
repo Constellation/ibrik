@@ -30,14 +30,14 @@ originalLoader = require.extensions['.coffee']
 hook = Object.create istanbul.hook
 
 transformFn = (matcher, transformer, verbose) ->
-    return (code, filename) ->
-        shouldHook = matcher(filename)
+    (code, filename) ->
+        shouldHook = matcher filename
         changed = no
 
         if shouldHook
-            console.error 'Module load hook: transform [' + filename + ']' if verbose
+            console.error "Module load hook: transform [#{filename}]" if verbose
             try
-                transformed = transformer(code, filename)
+                transformed = transformer code, filename
                 changed = yes
             catch ex
                 console.error 'Transformation error; return original code'
@@ -46,28 +46,27 @@ transformFn = (matcher, transformer, verbose) ->
         else
             transformed = code
 
-        { code: transformed, changed: changed }
+        {code: transformed, changed}
 
-hook.hookRequire = (matcher, transformer, options) ->
-    options = {} if not options?
-    fn = transformFn(matcher, transformer, options.verbose)
+hook.hookRequire = (matcher, transformer, options = {}) ->
+    fn = transformFn matcher, transformer, options.verbose
     postLoadHook = null
-    if options.postLoadHook && typeof options.postLoadHook is 'function'
+    if options.postLoadHook and typeof options.postLoadHook is 'function'
         postLoadHook = options.postLoadHook
 
     require.extensions['.coffee'] = (module, filename) ->
-        ret = fn(fs.readFileSync(filename, 'utf8'), filename)
+        ret = fn (fs.readFileSync filename, 'utf8'), filename
         if ret.changed
-            module._compile(ret.code, filename)
+            module._compile ret.code, filename
         else
-            originalLoader(module, filename)
-        postLoadHook(filename) if postLoadHook
+            originalLoader module, filename
+        postLoadHook filename if postLoadHook
 
-    istanbul.hook.hookRequire(matcher, transformer, options)
+    istanbul.hook.hookRequire matcher, transformer, options
 
 hook.unhookRequire = ->
     require.extensions['.coffee'] = originalLoader
-    istanbul.hook.unhookRequire()
+    do istanbul.hook.unhookRequire
 
 module.exports = hook
 # vim: set sw=4 ts=4 et tw=80 :
