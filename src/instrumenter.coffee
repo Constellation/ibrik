@@ -70,8 +70,6 @@ class Instrumenter extends istanbul.Instrumenter
 
         throw new Error 'Code must be string' unless typeof code is 'string'
 
-        code = "//#{code}" if code[0] is '#'
-
         csast = coffee.parse code, optimise: no, raw: yes
         program = coffee.compile csast, bare: yes
         @attachLocation program
