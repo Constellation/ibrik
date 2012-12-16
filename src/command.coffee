@@ -29,19 +29,18 @@ Usage: $0 subcommand
     cover
 ''').argv
 
-if not argv._[0]?
-    optimist.showHelp()
+command = argv._[0]
+unless command?
+    do optimist.showHelp
     process.exit 1
 
-switch argv._[0]
-    when 'cover' then require('./cover') argv, (err) ->
-        if err
-            console.error err
-            process.exit 1
-        process.exit 0
-    when 'report' then require('./report') argv, (err) ->
-        if err
-            console.error err
-            process.exit 1
-        process.exit 0
+unless command in ['cover', 'report']
+    console.error "Unrecognised command: `#{command}`. Run `#{argv['$0']}` for help."
+    process.exit 1
+
+(require "./#{command}") argv, (err) ->
+    if err
+        console.error err
+        process.exit 1
+    process.exit 0
 # vim: set sw=4 ts=4 et tw=80 :
