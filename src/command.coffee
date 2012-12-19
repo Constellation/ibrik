@@ -23,20 +23,39 @@
 fs = require 'fs'
 optimist = require 'optimist'
 
-argv = optimist.usage('''
-Usage: $0 subcommand
-=== subcommands ===
-    cover
-''').argv
+
+COMMANDS = [
+    'cover'
+    'report'
+]
+
+
+TAB = '    '
+argv = optimist.usage("""
+    Usage: $0 subcommand
+    === subcommands ===
+    #{TAB}#{COMMANDS.join "\n#{TAB}"}
+    """).argv
+
 
 command = argv._[0]
 unless command?
     do optimist.showHelp
-    process.exit 1
+    process.exit 0
 
-unless command in ['cover', 'report']
-    console.error "Unrecognised command: `#{command}`. Run `#{argv['$0']}` for help."
-    process.exit 1
+
+if command not in COMMANDS
+    possibilities = (c for c in COMMANDS when command is c[...command.length])
+    switch possibilities.length
+        when 0
+            console.error "Unrecognised command: `#{command}`. Run `#{argv['$0']}` for help."
+            process.exit 1
+        when 1
+            command = possibilities[0]
+        else
+            console.error "Ambiguous command `#{command}` matches `#{possibilities.join '`, `'}`"
+            process.exit 1
+
 
 (require "./#{command}") argv, (err) ->
     if err
