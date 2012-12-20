@@ -43,7 +43,7 @@ removeIndent = (code) ->
 
 calculateColumn = (raw, offset) ->
     code = raw[...offset]
-    lines = code.split /(?:\n|\r|[\r\n])/g
+    lines = code.split /(?:\r\n|[\r\n])/g
     (removeIndent lines[lines.length - 1]).length
 
 class Instrumenter extends istanbul.Instrumenter
@@ -102,7 +102,7 @@ class Instrumenter extends istanbul.Instrumenter
                             line: node.line
                             column: 0
                     node.loc.end.column = node.loc.start.column + value.length
-                    lines = value.split /(?:\n|\r|[\r\n])/g
+                    lines = value.split /(?:\r\n|[\r\n])/g
                     unless lines.length in [0, 1]
                         node.loc.end.line += lines.length - 1
                         node.loc.end.column = removeIndent(lines[lines.length - 1]).length
