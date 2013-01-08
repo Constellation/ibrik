@@ -23,7 +23,7 @@
 fs = require 'fs'
 Module = require 'module'
 istanbul = require 'istanbul'
-coffee = require 'CoffeeScriptRedux'
+coffee = require 'coffee-script-redux'
 
 originalLoader = require.extensions['.coffee']
 

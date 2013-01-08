@@ -20,7 +20,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-coffee = require 'CoffeeScriptRedux'
+coffee = require 'coffee-script-redux'
 istanbul = require 'istanbul'
 crypto = require 'crypto'
 escodegen = require 'escodegen'
