@@ -9,7 +9,7 @@
     "bin": {
         "ibrik": "./bin/ibrik.js"
     },
-    "version": "0.0.3-dev",
+    "version": "0.0.4-dev",
     "engines": {
         "node": ">=0.4.0"
     },
