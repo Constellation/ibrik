@@ -30,11 +30,11 @@ COMMANDS = [
 ]
 
 
-TAB = '    '
+TAB = '        '
 argv = optimist.usage("""
     Usage: $0 subcommand
     === subcommands ===
-    #{TAB}#{COMMANDS.join "\n#{TAB}"}
+#{TAB}#{COMMANDS.join "\n#{TAB}"}
     """).argv
 
 
