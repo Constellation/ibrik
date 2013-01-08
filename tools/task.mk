@@ -1,4 +1,5 @@
 COFFEE = ./node_modules/.bin/coffee
+WATCH = $(COFFEE) ./tools/watch.coffee
 
 LIBDIR = lib
 SRCDIR = src
@@ -8,9 +9,10 @@ SRC = $(wildcard $(SRCDIR)/*.coffee)
 LIB = $(patsubst $(SRCDIR)/%.coffee,$(LIBDIR)/%.js,$(SRC))
 
 .SUFFIXES: .coffee .js
-.PHONY: all clean
+.PHONY: all build watch clean
 
-all: $(LIB)
+all: build
+build: $(LIB)
 
 $(LIB): | $(LIBDIR)
 
@@ -21,4 +23,7 @@ $(LIBDIR)/%.js: %.coffee
 	$(COFFEE) -j < "$<" > "$@"
 
 clean:
-	$(RM) -r $(LIBDIR)
+	@rm -r $(LIBDIR)
+
+watch:
+	$(WATCH) $(LIBDIR) $(SRCDIR)
