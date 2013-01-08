@@ -8,7 +8,6 @@ esprima.js
 /tmp/
 /.git/
 /node_modules/
-/tools/
 /test/
 /cover_html/
 /.coverage_data/
