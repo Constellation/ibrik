@@ -7,7 +7,7 @@
         "lib": "./lib"
     },
     "bin": {
-        "ibrik": "./bin/ibrik.js"
+        "ibrik": "./bin/ibrik"
     },
     "version": "0.0.4-dev",
     "engines": {
