@@ -3,10 +3,9 @@ WATCH = $(COFFEE) ./tools/watch.coffee
 
 LIBDIR = lib
 SRCDIR = src
-vpath %.coffee $(SRCDIR)
 
 SRC = $(wildcard $(SRCDIR)/*.coffee)
-LIB = $(patsubst $(SRCDIR)/%.coffee,$(LIBDIR)/%.js,$(SRC))
+LIB = $(SRC:$(SRCDIR)/%.coffee=$(LIBDIR)/%.js)
 
 .SUFFIXES: .coffee .js
 .PHONY: all build watch clean
@@ -14,12 +13,12 @@ LIB = $(patsubst $(SRCDIR)/%.coffee,$(LIBDIR)/%.js,$(SRC))
 all: build
 build: $(LIB)
 
-$(LIB): | $(LIBDIR)
+$(LIB): $(LIBDIR)
 
 $(LIBDIR):
 	@mkdir -p "$@"
 
-$(LIBDIR)/%.js: %.coffee
+$(LIBDIR)/%.js: $(SRCDIR)/%.coffee $(LIBDIR)
 	$(COFFEE) -j < "$<" > "$@"
 
 clean:

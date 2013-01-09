@@ -24,7 +24,7 @@
         "url": "http://github.com/Constellation/ibrik.git"
     },
     "dependencies": {
-        "CoffeeScriptRedux": "git://github.com/michaelficarra/CoffeeScriptRedux.git#6e83e6f1cd3d63a2096c160d57fc8ee1ab09ccc3",
+        "coffee-script-redux": "git://github.com/michaelficarra/CoffeeScriptRedux.git#6e83e6f1cd3d63a2096c160d57fc8ee1ab09ccc3",
         "istanbul": "*",
         "optimist": "*",
         "escodegen": "*",
@@ -42,6 +42,8 @@
     }],
     "scripts": {
         "test": "./node_modules/.bin/mocha",
-        "install": "make -f tools/task.mk build"
+        "install": "npm run-script build",
+        "build": "make -f tools/task.mk build",
+        "watch": "make -f tools/task.mk watch"
     }
 }
