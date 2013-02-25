@@ -84,7 +84,7 @@ class Instrumenter extends istanbul.Instrumenter
         # CoffeeScriptRedux compiler
         estraverse.traverse program,
             leave: (node, parent) ->
-                if node.offset? and (node.raw? or node.value?)
+                if node.loc? and node.range? and (node.raw? or node.value?)
                     value =
                         if node.raw?
                             node.raw
@@ -96,10 +96,10 @@ class Instrumenter extends istanbul.Instrumenter
                     # calculate start line & column
                     node.loc =
                         start:
-                            line: node.line
-                            column: calculateColumn program.raw, node.offset
+                            line: node.loc.start.line
+                            column: calculateColumn program.raw, node.range[0]
                         end:
-                            line: node.line
+                            line: node.loc.start.line
                             column: 0
                     node.loc.end.column = node.loc.start.column + value.length
                     lines = value.split /(?:\r\n|[\r\n])/g
