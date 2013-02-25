@@ -20,7 +20,15 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+istanbul = require 'istanbul'
+
+# copy istanbul implementation to ibrik
+for own key, value of istanbul
+    exports[key] = value
+
+# override with ibrik
 exports.Instrumenter = require './instrumenter'
 exports.hook = require './hook'
 exports.version = '0.0.4-dev'
+
 # vim: set sw=4 ts=4 et tw=80 :
