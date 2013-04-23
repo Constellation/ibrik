@@ -23,7 +23,7 @@
 fs = require 'fs'
 Module = require 'module'
 istanbul = require 'istanbul'
-coffee = require 'coffee-script-redux'
+coffee = require 'coffee-script'
 
 # register loader for coffee-script-redux
 do coffee.register
@@ -45,6 +45,7 @@ transformFn = (matcher, transformer, verbose) ->
                 console.error 'Transformation error; return original code'
                 console.error ex.stack
                 console.error ex
+                console.error ex.stack
                 transformed = code
         else
             transformed = code

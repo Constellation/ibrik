@@ -20,11 +20,12 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-coffee = require 'coffee-script-redux'
+coffee = require 'coffee-script'
 istanbul = require 'istanbul'
 escodegen = require 'escodegen'
 estraverse = require 'estraverse'
 _ = require 'lodash'
+esprima = require 'esprima'
 
 class StructuredCode
     constructor: (code) ->
@@ -66,9 +67,9 @@ class Instrumenter extends istanbul.Instrumenter
 
         throw new Error 'Code must be string' unless typeof code is 'string'
 
-        csast = coffee.parse code, optimise: no, raw: yes
-        program = coffee.compile csast, bare: yes
-        @fixupLoc program, code
+        code = coffee.compile code, sourceMap: true
+        program = esprima.parse(code.js, loc: true)
+        @fixupLoc program, code.sourceMap
         @instrumentASTSync program, filename, code
 
     fixupLoc: (program)->
@@ -81,39 +82,21 @@ class Instrumenter extends istanbul.Instrumenter
         structured = new StructuredCode(program.raw)
         estraverse.traverse program,
             leave: (node, parent) ->
-                if node.range?
-                    # calculate start line & column
-                    loc =
-                        start: null
-                        end: structured.loc(node.range[1])
-                    if node.loc?
-                        loc.start = node.loc.start
-                    else
-                        loc.start = structured.loc(node.range[0])
-                    node.loc = loc
-                else
-                    node.loc = switch node.type
-                        when 'BlockStatement'
-                            if node.body.length
-                                start: node.body[0].loc.start
-                                end: node.body[node.body.length - 1].loc.end
-                            else
-                                notFound
-                        when 'VariableDeclarator'
-                            if node?.init?.loc?
-                                start: node.id.loc.start
-                                end: node.init.loc.end
-                            else
-                                node.id.loc
-                        when 'ExpressionStatement'
-                            node.expression.loc
-                        when 'ReturnStatement'
-                            if node.argument? then node.argument.loc else node.loc
-                        when 'VariableDeclaration'
-                            start: node.declarations[0].loc.start
-                            end: node.declarations[node.declarations.length - 1].loc.end
-                        else
-                            notFound
+                mappedLocation = (location) ->
+                  locArray = sourceMap.getSourcePosition([
+                    location.line - program.loc.start.line,
+                    location.column - program.loc.start.column])
+                  line = 0
+                  column = 0
+                  if locArray
+                    line = locArray[0] + program.loc.start.line
+                    column = locArray[1] + program.loc.start.column
+                  return { line: line, column: column }
+
+                if node.loc?.start
+                  node.loc.start = mappedLocation(node.loc.start)
+                if node.loc?.end
+                  node.loc.end = mappedLocation(node.loc.end)
                 return
 
 module.exports = Instrumenter
