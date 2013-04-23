@@ -84,13 +84,13 @@ class Instrumenter extends istanbul.Instrumenter
             leave: (node, parent) ->
                 mappedLocation = (location) ->
                   locArray = sourceMap.getSourcePosition([
-                    location.line - program.loc.start.line,
-                    location.column - program.loc.start.column])
+                    location.line - 1,
+                    location.column])
                   line = 0
                   column = 0
                   if locArray
-                    line = locArray[0] + program.loc.start.line
-                    column = locArray[1] + program.loc.start.column
+                    line = locArray[0] + 1
+                    column = locArray[1]
                   return { line: line, column: column }
 
                 if node.loc?.start
