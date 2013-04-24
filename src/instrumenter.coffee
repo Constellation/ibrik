@@ -26,6 +26,8 @@ escodegen = require 'escodegen'
 estraverse = require 'estraverse'
 _ = require 'lodash'
 esprima = require 'esprima'
+path = require 'path'
+fs = require 'fs'
 
 class StructuredCode
     constructor: (code) ->
@@ -71,6 +73,18 @@ class Instrumenter extends istanbul.Instrumenter
         program = esprima.parse(code.js, loc: true)
         @fixupLoc program, code.sourceMap
         @instrumentASTSync program, filename, code
+
+    # Used to ensure that a module is included in the code coverage report
+    # (even if it is not loaded during the test)
+    includeInCoverageReport: (filename) ->
+        filename = path.resolve(filename)
+        code = fs.readFileSync(filename, 'utf8')
+        @instrumentSync(code, filename)
+
+        # Setup istanbul's references for this module
+        eval("#{@getPreamble null}")
+
+        return
 
     fixupLoc: (program)->
         # TODO(Constellation)
