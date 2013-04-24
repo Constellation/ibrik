@@ -69,14 +69,18 @@ class Instrumenter extends istanbul.Instrumenter
 
         throw new Error 'Code must be string' unless typeof code is 'string'
 
-        code = coffee.compile code, sourceMap: true
-        program = esprima.parse(code.js, loc: true)
-        @fixupLoc program, code.sourceMap
-        @instrumentASTSync program, filename, code
+        try
+          code = coffee.compile code, sourceMap: true
+          program = esprima.parse(code.js, loc: true)
+          @fixupLoc program, code.sourceMap
+          @instrumentASTSync program, filename, code
+        catch e
+          e.message = "Error compiling #{filename}: #{e.message}"
+          throw e
 
     # Used to ensure that a module is included in the code coverage report
     # (even if it is not loaded during the test)
-    includeInCoverageReport: (filename) ->
+    include: (filename) ->
         filename = path.resolve(filename)
         code = fs.readFileSync(filename, 'utf8')
         @instrumentSync(code, filename)
