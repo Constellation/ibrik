@@ -31,6 +31,7 @@ ibrik = require './ibrik'
 istanbul = require 'istanbul'
 mkdirp = require 'mkdirp'
 which = require 'which'
+glob = require 'glob'
 
 existsSync = fs.existsSync or path.existsSync
 
@@ -89,6 +90,13 @@ module.exports = (opts, callback) ->
         ibrik.hook.unloadRequireCache matchFn if opts['self-test']
 
         ibrik.hook.hookRequire matchFn, transformer, hookOpts
+
+        if opts?.files?.include
+          if typeof opts.files.include is 'string'
+            # Handle single value case
+            opts.files.include = [opts.files.include]
+          for fileGroup in opts.files.include
+            instrumenter.include(filename) for filename in glob.sync(fileGroup)
 
         process.once 'exit', ->
             file = path.resolve reportingDir, 'coverage.json'
