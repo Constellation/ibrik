@@ -31,7 +31,7 @@ ibrik = require './ibrik'
 istanbul = require 'istanbul'
 mkdirp = require 'mkdirp'
 which = require 'which'
-glob = require 'glob'
+fileset = require 'fileset'
 
 existsSync = fs.existsSync or path.existsSync
 
@@ -91,13 +91,6 @@ module.exports = (opts, callback) ->
 
         ibrik.hook.hookRequire matchFn, transformer, hookOpts
 
-        if opts?.files?.include
-          if typeof opts.files.include is 'string'
-            # Handle single value case
-            opts.files.include = [opts.files.include]
-          for fileGroup in opts.files.include
-            instrumenter.include(filename) for filename in glob.sync(fileGroup)
-
         process.once 'exit', ->
             file = path.resolve reportingDir, 'coverage.json'
             if not global[coverageVar]?
@@ -116,6 +109,17 @@ module.exports = (opts, callback) ->
             report.writeReport collector, yes for report in reports
             return callback(null, cov)
 
-        do runFn
+        if opts?.files?.include
+          if typeof opts.files.include is 'string'
+            # Handle single value case
+            opts.files.include = [opts.files.include]
+          fileset opts.files.include.join(' '), excludes.join(' '), (err, files) ->
+            if err
+              console.error 'Error including files: ', err
+            else
+              instrumenter.include(filename) for filename in files
+              do runFn
+        else
+          do runFn
 
 # vim: set sw=4 ts=4 et tw=80 :
