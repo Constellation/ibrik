@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "lodash": "~2.4.1",
-    "coffee-script": "~ 1.6.2",
+    "coffee-script": "~ 1.6.3",
     "istanbul": "~0.2.4",
     "estraverse": "~1.5.0",
     "escodegen": "~1.1.0",
