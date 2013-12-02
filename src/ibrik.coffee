@@ -29,6 +29,6 @@ for own key, value of istanbul
 # override with ibrik
 exports.Instrumenter = require './instrumenter'
 exports.hook = require './hook'
-exports.version = '0.0.5-dev'
+exports.version = require('../package.json').version
 
 # vim: set sw=4 ts=4 et tw=80 :
