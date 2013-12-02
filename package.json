@@ -1,7 +1,7 @@
 {
     "name": "ibrik",
     "description": "CoffeeScript coverage tool",
-    "homepage": "http://github.com/Constellation/ibrik.html",
+    "homepage": "https://github.com/Constellation/ibrik.html",
     "main": "./lib/ibrik",
     "directories": {
         "lib": "./lib",
@@ -21,10 +21,10 @@
     }],
     "repository": {
         "type": "git",
-        "url": "http://github.com/Constellation/ibrik.git"
+        "url": "https://github.com/Constellation/ibrik.git"
     },
     "dependencies": {
-        "coffee-script-redux": "git://github.com/michaelficarra/CoffeeScriptRedux.git#9895cd1641fdf3a2424e662ab7583726bb0e35b3",
+        "coffee-script-redux": "https://github.com/michaelficarra/CoffeeScriptRedux.git#9895cd1641fdf3a2424e662ab7583726bb0e35b3",
         "istanbul": "*",
         "optimist": "*",
         "escodegen": "*",
@@ -42,7 +42,6 @@
     }],
     "scripts": {
         "test": "./node_modules/.bin/mocha",
-        "install": "npm run-script build",
         "build": "make -f tools/task.mk build",
         "watch": "make -f tools/task.mk watch"
     }
