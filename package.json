@@ -24,7 +24,7 @@
         "url": "https://github.com/Constellation/ibrik.git"
     },
     "dependencies": {
-        "coffee-script-redux": "https://github.com/michaelficarra/CoffeeScriptRedux.git#9895cd1641fdf3a2424e662ab7583726bb0e35b3",
+        "coffee-script-redux": "git+https://github.com/michaelficarra/CoffeeScriptRedux.git#9895cd1641fdf3a2424e662ab7583726bb0e35b3",
         "istanbul": "*",
         "optimist": "*",
         "escodegen": "*",
@@ -41,8 +41,8 @@
         "url": "http://github.com/Constellation/ibrik/raw/master/LICENSE.BSD"
     }],
     "scripts": {
-        "test": "./node_modules/.bin/mocha",
-        "build": "make -f tools/task.mk build",
-        "watch": "make -f tools/task.mk watch"
+        "test": "mocha",
+        "build": "make build",
+        "watch": "make watch"
     }
 }
