@@ -12,4 +12,4 @@ esprima.js
 /cover_html/
 /.coverage_data/
 /coverage/
-/lib/
+/src/
