@@ -25,6 +25,7 @@ istanbul = require 'istanbul'
 crypto = require 'crypto'
 escodegen = require 'escodegen'
 estraverse = require 'estraverse'
+_ = require 'lodash'
 
 generateTrackerVar = (filename, omitSuffix) ->
     if omitSuffix
@@ -35,16 +36,36 @@ generateTrackerVar = (filename, omitSuffix) ->
     suffix = suffix.replace(/\=/g, '').replace(/\+/g, '_').replace(/\//g, '$')
     "__cov_#{suffix}"
 
-# TODO(Constellation)
-# fix CoffeeScriptRedux compiler
-# https://github.com/michaelficarra/CoffeeScriptRedux/issues/117
-removeIndent = (code) ->
-    code.replace /[\uEFEF\uEFFE\uEFFF]/g, ''
+class StructuredCode
+    constructor: (code) ->
+        @cursors = @generateOffsets code
+        @length = @cursors.length
 
-calculateColumn = (raw, offset) ->
-    code = raw[...offset]
-    lines = code.split /(?:\r\n|[\r\n])/g
-    (removeIndent lines[lines.length - 1]).length
+    generateOffsets: (code) ->
+        reg = /(?:\r\n|[\r\n\u2028\u2029])/g
+        result = [ 0 ]
+        while res = reg.exec(code)
+            cursor = res.index + res[0].length
+            reg.lastIndex = cursor
+            result.push cursor
+        result
+
+    column: (offset) ->
+        @loc(offset).column
+
+    line: (offset) ->
+        @loc(offset).line
+
+    loc: (offset) ->
+        index = _.sortedIndex @cursors, offset
+        if @cursors.length > index and @cursors[index] is offset
+            column = 0
+            line = index + 1
+        else
+            column = offset - @cursors[index - 1]
+            line = index
+        { column, line }
+
 
 class Instrumenter extends istanbul.Instrumenter
     constructor: (opt) ->
@@ -52,60 +73,31 @@ class Instrumenter extends istanbul.Instrumenter
 
     instrumentSync: (code, filename) ->
         filename = filename or "#{Date.now()}.js"
-        @coverState =
-            path: filename
-            s: {}
-            b: {}
-            f: {}
-            fnMap: {}
-            statementMap: {}
-            branchMap: {}
-
-        @currentState =
-            trackerVar: generateTrackerVar filename, @omitTrackerSuffix
-            func: 0
-            branch: 0
-            variable: 0
-            statement: 0
 
         throw new Error 'Code must be string' unless typeof code is 'string'
 
         csast = coffee.parse code, optimise: no, raw: yes
         program = coffee.compile csast, bare: yes
-        @attachLocation program
+        @fixupLoc program, code
+        @instrumentASTSync program, filename, code
 
-        @walker.startWalk program
-        codegenOptions = @opts.codeGenerationOptions or format: compact: not this.opts.noCompact
-        "#{@getPreamble code}\n#{escodegen.generate program, codegenOptions}\n"
-
-    attachLocation: (program)->
+    fixupLoc: (program)->
         # TODO(Constellation)
         # calculate precise offset or attach in
         # CoffeeScriptRedux compiler
+        structured = new StructuredCode(program.raw)
         estraverse.traverse program,
             leave: (node, parent) ->
-                if node.loc? and node.range? and (node.raw? or node.value?)
-                    value =
-                        if node.raw?
-                            node.raw
-                        else if typeof node.value is 'string'
-                            "\"#{node.value.replace /"/g, '\\"'}\""
-                        else
-                            "#{node.value}"
-
+                if node.range?
                     # calculate start line & column
-                    node.loc =
-                        start:
-                            line: node.loc.start.line
-                            column: calculateColumn program.raw, node.range[0]
-                        end:
-                            line: node.loc.start.line
-                            column: 0
-                    node.loc.end.column = node.loc.start.column + value.length
-                    lines = value.split /(?:\r\n|[\r\n])/g
-                    unless lines.length in [0, 1]
-                        node.loc.end.line += lines.length - 1
-                        node.loc.end.column = removeIndent(lines[lines.length - 1]).length
+                    loc =
+                        start: null
+                        end: structured.loc(node.range[1])
+                    if node.loc?
+                        loc.start = node.loc.start
+                    else
+                        loc.start = structured.loc(node.range[0])
+                    node.loc = loc
                 else
                     node.loc = switch node.type
                         when 'BlockStatement'

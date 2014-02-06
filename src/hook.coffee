@@ -25,6 +25,8 @@ Module = require 'module'
 istanbul = require 'istanbul'
 coffee = require 'coffee-script-redux'
 
+# register loader for coffee-script-redux
+do coffee.register
 originalLoader = require.extensions['.coffee']
 
 hook = Object.create istanbul.hook
@@ -41,6 +43,7 @@ transformFn = (matcher, transformer, verbose) ->
                 changed = yes
             catch ex
                 console.error 'Transformation error; return original code'
+                console.error ex.stack
                 console.error ex
                 transformed = code
         else
