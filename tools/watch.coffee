@@ -51,20 +51,24 @@ fs.mkdir libdir, ->
                 compile src, dst
 
         refresh = ->
+            console.log 'watch', srcdir
             watcher.close() for watcher in watchers
             fs.readdir srcdir, (err, files) ->
+                console.log files
                 for file in files
                     do ->
                         src = path.join srcdir, file
                         dst = path.join libdir, "#{path.basename file, '.coffee'}.js"
                         watcher = fs.watch src, (event, filename) ->
+                            console.log 'starting...', event
                             if event is 'change'
                                 compile src, dst
                         watchers.push watcher
 
         # notify directory file list change
-        fs.watch srcdir, (event, filename) ->
-            do refresh
+        # fs.watch srcdir, (event, filename) ->
+        #     console.log event
+        #     do refresh
 
         do refresh
 
