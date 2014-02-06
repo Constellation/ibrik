@@ -36,8 +36,10 @@
     "lodash": "~2.4.1"
   },
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*"
+    "chai": "~1.9.0",
+    "mocha": "~1.17.1",
+    "promised-io": "~0.3.4",
+    "bluebird": "~1.0.3"
   },
   "licenses": [
     {
@@ -46,7 +48,7 @@
     }
   ],
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --compilers coffee:coffee-script-redux/register",
     "build": "make build",
     "watch": "make watch"
   }
