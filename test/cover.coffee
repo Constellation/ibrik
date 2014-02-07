@@ -28,31 +28,42 @@ Promise = require('bluebird')
 PromisedFS = require('promised-io/fs')
 child_process = require 'child_process'
 
-describe 'coverage', ->
-    it 'simple', (done) ->
+coverTest = (file) ->
+    new Promise (resolve, reject) ->
         proc = child_process.spawn 'node', [
             'bin/ibrik'
             'cover'
-            'test/fixture/test001.coffee'
+            file
             '--dir'
-            'tmp/test/test001.coffee'
+            "tmp/#{file}"
             '--no-default-excludes'
             '--self-test'
         ]
         proc.stdout.on 'data', (data) -> process.stdout.write(data)
         proc.stderr.on 'data', (data) -> process.stdout.write(data)
         proc.on 'exit', (code) ->
-            if code
-                done code
-                return
+            return reject code if code
 
-            Promise.all([
-                PromisedFS.readFile('tmp/test/test001.coffee/coverage.json', 'utf-8')
-                PromisedFS.readFile('test/fixture/test001.coffee.json', 'utf-8')
-            ]).then(([actual, expected]) ->
+            resolve(Promise.all([
+                PromisedFS.readFile("tmp/#{file}/coverage.json", 'utf-8')
+                PromisedFS.readFile("#{file}.json", 'utf-8')
+            ]))
+
+
+describe 'coverage', ->
+    it 'simple', (done) ->
+        coverTest('test/fixture/test001.coffee')
+            .then(([actual, expected]) ->
                 expect(JSON.parse(expected)).to.eql JSON.parse(actual)
                 do done
-            ).catch((err) ->
-                do err
             )
+            .catch(done)
+
+    it 'complicated', (done) ->
+        coverTest('test/fixture/third_party/StringScannerWithTest.coffee')
+            .then(([actual, expected]) ->
+                expect(JSON.parse(expected)).to.eql JSON.parse(actual)
+                do done
+            )
+            .catch(done)
 
