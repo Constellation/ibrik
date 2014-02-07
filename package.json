@@ -50,6 +50,7 @@
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script-redux/register",
     "build": "make build",
-    "watch": "make watch"
+    "watch": "make watch",
+    "release": "npm run-script build && npm publish ."
   }
 }
