@@ -22,19 +22,9 @@
 
 coffee = require 'coffee-script-redux'
 istanbul = require 'istanbul'
-crypto = require 'crypto'
 escodegen = require 'escodegen'
 estraverse = require 'estraverse'
 _ = require 'lodash'
-
-generateTrackerVar = (filename, omitSuffix) ->
-    if omitSuffix
-        return '__cov_'
-    hash = crypto.createHash 'md5'
-    hash.update filename
-    suffix = hash.digest 'base64'
-    suffix = suffix.replace(/\=/g, '').replace(/\+/g, '_').replace(/\//g, '$')
-    "__cov_#{suffix}"
 
 class StructuredCode
     constructor: (code) ->
