@@ -26,14 +26,14 @@
     "url": "git://github.com/Constellation/ibrik.git"
   },
   "dependencies": {
-    "coffee-script-redux": "git+https://github.com/michaelficarra/CoffeeScriptRedux.git#158303ac4e4badfed469f0e47314d14065fff329",
-    "optimist": "*",
-    "escodegen": "*",
-    "mkdirp": "*",
-    "which": "*",
-    "estraverse": "*",
+    "lodash": "~2.4.1",
+    "coffee-script-redux": "=2.0.0-beta8",
     "istanbul": "~0.2.4",
-    "lodash": "~2.4.1"
+    "estraverse": "~1.5.0",
+    "escodegen": "~1.1.0",
+    "which": "~1.0.5",
+    "mkdirp": "~0.3.5",
+    "optimist": "~0.6.1"
   },
   "devDependencies": {
     "chai": "~1.9.0",
