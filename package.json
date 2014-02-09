@@ -26,7 +26,7 @@
     "url": "git://github.com/Constellation/ibrik.git"
   },
   "dependencies": {
-    "lodash": "~2.4.1",
+    "lodash.sortedindex": "~2.4.1",
     "coffee-script-redux": "=2.0.0-beta8",
     "istanbul": "~0.2.4",
     "estraverse": "~1.5.0",

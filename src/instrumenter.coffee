@@ -24,7 +24,7 @@ coffee = require 'coffee-script-redux'
 istanbul = require 'istanbul'
 escodegen = require 'escodegen'
 estraverse = require 'estraverse'
-_ = require 'lodash'
+sortedIndex = require 'lodash.sortedindex'
 
 class StructuredCode
     constructor: (code) ->
@@ -47,7 +47,7 @@ class StructuredCode
         @loc(offset).line
 
     loc: (offset) ->
-        index = _.sortedIndex @cursors, offset
+        index = sortedIndex @cursors, offset
         if @cursors.length > index and @cursors[index] is offset
             column = 0
             line = index + 1
