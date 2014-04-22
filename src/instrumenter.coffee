@@ -75,6 +75,9 @@ class Instrumenter extends istanbul.Instrumenter
         # TODO(Constellation)
         # calculate precise offset or attach in
         # CoffeeScriptRedux compiler
+        notFound =
+            start: {line: 0, column: 0}
+            end: {line: 0, column: 0}
         structured = new StructuredCode(program.raw)
         estraverse.traverse program,
             leave: (node, parent) ->
@@ -91,8 +94,11 @@ class Instrumenter extends istanbul.Instrumenter
                 else
                     node.loc = switch node.type
                         when 'BlockStatement'
-                            start: node.body[0].loc.start
-                            end: node.body[node.body.length - 1].loc.end
+                            if node.body.length
+                                start: node.body[0].loc.start
+                                end: node.body[node.body.length - 1].loc.end
+                            else
+                                notFound
                         when 'VariableDeclarator'
                             if node?.init?.loc?
                                 start: node.id.loc.start
@@ -107,8 +113,7 @@ class Instrumenter extends istanbul.Instrumenter
                             start: node.declarations[0].loc.start
                             end: node.declarations[node.declarations.length - 1].loc.end
                         else
-                            start: {line: 0, column: 0}
-                            end: {line: 0, column: 0}
+                            notFound
                 return
 
 module.exports = Instrumenter
