@@ -27,6 +27,7 @@ expect = require('chai').expect
 Promise = require('bluebird')
 PromisedFS = require('promised-io/fs')
 child_process = require 'child_process'
+path = require 'path'
 
 coverTest = (file) ->
     new Promise (resolve, reject) ->
@@ -54,7 +55,9 @@ describe 'coverage', ->
     it 'simple', (done) ->
         coverTest('test/fixture/test001.coffee')
             .then(([actual, expected]) ->
-                expect(JSON.parse(expected)).to.eql JSON.parse(actual)
+                actual = property for name, property of JSON.parse actual
+                actual.path = path.relative '.', actual.path
+                expect(JSON.parse(expected)).to.eql actual
                 do done
             )
             .catch(done)
