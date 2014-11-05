@@ -57,9 +57,10 @@ module.exports = (opts, callback) ->
     mkdirp.sync reportingDir
 
     reportClassNames = opts.report or DEFAULT_REPORT_FORMAT
+    reports = []
     if reportClassNames instanceof Array
         for reportClassName in reportClassNames
-            reportClassNames.push(istanbul.Report.create(reportClassName, { dir: reportingDir }))
+            reports.push(istanbul.Report.create(reportClassName, { dir: reportingDir }))
     else
         reports.push(istanbul.Report.create(reportClassNames, { dir: reportingDir }))
 
