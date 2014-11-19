@@ -1,4 +1,4 @@
-COFFEE = coffee
+COFFEE = ./node_modules/.bin/coffee
 WATCH = $(COFFEE) ./tools/watch.coffee
 
 LIBDIR = lib
