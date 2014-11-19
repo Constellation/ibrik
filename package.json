@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "lodash": "~2.4.1",
-    "coffee-script": "~ 1.6.3",
+    "coffee-script": "~ 1.7.0",
     "istanbul": "~0.2.4",
     "estraverse": "~1.5.0",
     "escodegen": "~1.1.0",
@@ -50,7 +50,7 @@
     }
   ],
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script-redux/register",
+    "test": "mocha --compilers coffee:coffee-script/register",
     "build": "make build",
     "watch": "make watch",
     "release": "npm run-script build && npm publish ."

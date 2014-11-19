@@ -90,7 +90,7 @@ class Instrumenter extends istanbul.Instrumenter
 
         return
 
-    fixupLoc: (program)->
+    fixupLoc: (program, sourceMap)->
         # TODO(Constellation)
         # calculate precise offset or attach in
         # CoffeeScriptRedux compiler
