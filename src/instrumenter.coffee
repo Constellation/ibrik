@@ -1,4 +1,5 @@
 #  Copyright (C) 2012-2014 Yusuke Suzuki <utatane.tea@gmail.com>
+#  Copyright (C) 2013-2014 Jeff Stamerjohn <jstamerj@gmail.com>
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are met:
