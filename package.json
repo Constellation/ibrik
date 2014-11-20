@@ -41,6 +41,7 @@
     "chai": "~1.10.0",
     "gulp": "^3.8.10",
     "gulp-coffee": "^2.2.0",
+    "gulp-mocha": "^2.0.0",
     "mocha": "~2.0.1",
     "promised-io": "~0.3.4"
   },
@@ -51,7 +52,7 @@
     }
   ],
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script/register",
+    "test": "gulp test",
     "build": "gulp build",
     "watch": "gulp watch",
     "release": "npm run build && npm publish ."

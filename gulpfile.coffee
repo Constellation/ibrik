@@ -23,12 +23,18 @@
 
 gulp   = require 'gulp'
 coffee = require 'gulp-coffee'
+mocha  = require 'gulp-mocha'
+require 'coffee-script/register'
 
 SOURCE = [
     'src/*.coffee'
 ]
 
 DEST = 'lib'
+
+TEST = [
+    'test/*.coffee'
+]
 
 gulp.task 'build', ->
     gulp.src(SOURCE)
@@ -41,5 +47,12 @@ gulp.task 'watch', [ 'build' ], ->
     gulp.watch SOURCE, [ 'build' ]
 
 gulp.task 'default', [ 'build' ]
+
+gulp.task 'test', ->
+    gulp.src(TEST)
+    .pipe(mocha(
+        reporter: 'spec',
+        timeout: 100000
+    ))
 
 # vim: set sw=4 ts=4 et tw=80 :
