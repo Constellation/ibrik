@@ -46,13 +46,26 @@ generateCoverage = (file) ->
             return reject code if code
 
             resolve(Promise.all([
+                # actual
                 PromisedFS.readFile("tmp/#{file}/coverage.json", 'utf-8')
+                .then((text) ->
+                    # Adjust absolute path in coverage.json file.
+                    actual = JSON.parse text
+                    actual = property for name, property of actual
+                    actual.path = path.relative '.', actual.path
+                    return actual
+                ),
+                # expected
                 PromisedFS.readFile("#{file}.json", 'utf-8')
+                .then((text) ->
+                    # Expected file should not contain absolute path.
+                    return JSON.parse text
+                )
             ]))
 
 coverTest = (file) ->
     generateCoverage(file).then ([actual, expected]) ->
-        expect(JSON.parse(expected)).to.deep.equal JSON.parse(actual)
+        expect(expected).to.deep.equal actual
         return null
 
 describe 'coverage', ->
