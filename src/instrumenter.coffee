@@ -22,43 +22,16 @@
 
 coffee = require 'coffee-script'
 istanbul = require 'istanbul'
-escodegen = require 'escodegen'
 estraverse = require 'estraverse'
 _ = require 'lodash'
 esprima = require 'esprima'
 path = require 'path'
 fs = require 'fs'
 
-class StructuredCode
-    constructor: (code) ->
-        @cursors = @generateOffsets code
-        @length = @cursors.length
-
-    generateOffsets: (code) ->
-        reg = /(?:\r\n|[\r\n\u2028\u2029])/g
-        result = [ 0 ]
-        while res = reg.exec(code)
-            cursor = res.index + res[0].length
-            reg.lastIndex = cursor
-            result.push cursor
-        result
-
-    column: (offset) ->
-        @loc(offset).column
-
-    line: (offset) ->
-        @loc(offset).line
-
-    loc: (offset) ->
-        index = _.sortedIndex @cursors, offset
-        if @cursors.length > index and @cursors[index] is offset
-            column = 0
-            line = index + 1
-        else
-            column = offset - @cursors[index - 1]
-            line = index
-        { column, line }
-
+# Use ECMAScript 5.1th indirect call to eval instead of direct eval call.
+globalEval = (source) ->
+    geval = eval
+    return geval source
 
 class Instrumenter extends istanbul.Instrumenter
     constructor: (opt) ->
@@ -70,13 +43,13 @@ class Instrumenter extends istanbul.Instrumenter
         throw new Error 'Code must be string' unless typeof code is 'string'
 
         try
-          code = coffee.compile code, sourceMap: true
-          program = esprima.parse(code.js, loc: true)
-          @fixupLoc program, code.sourceMap
-          @instrumentASTSync program, filename, code
+            code = coffee.compile code, sourceMap: true
+            program = esprima.parse(code.js, loc: true)
+            @fixupLoc program, code.sourceMap
+            @instrumentASTSync program, filename, code
         catch e
-          e.message = "Error compiling #{filename}: #{e.message}"
-          throw e
+            e.message = "Error compiling #{filename}: #{e.message}"
+            throw e
 
     # Used to ensure that a module is included in the code coverage report
     # (even if it is not loaded during the test)
@@ -86,35 +59,29 @@ class Instrumenter extends istanbul.Instrumenter
         @instrumentSync(code, filename)
 
         # Setup istanbul's references for this module
-        eval("#{@getPreamble null}")
+        globalEval("#{@getPreamble null}")
 
         return
 
     fixupLoc: (program, sourceMap)->
-        # TODO(Constellation)
-        # calculate precise offset or attach in
-        # CoffeeScriptRedux compiler
-        notFound =
-            start: {line: 0, column: 0}
-            end: {line: 0, column: 0}
-        structured = new StructuredCode(program.raw)
         estraverse.traverse program,
             leave: (node, parent) ->
                 mappedLocation = (location) ->
-                  locArray = sourceMap.sourceLocation([
-                    location.line - 1,
-                    location.column])
-                  line = 0
-                  column = 0
-                  if locArray
-                    line = locArray[0] + 1
-                    column = locArray[1]
-                  return { line: line, column: column }
+                    locArray = sourceMap.sourceLocation([
+                        location.line - 1
+                        location.column
+                    ])
+                    line = 0
+                    column = 0
+                    if locArray
+                        line = locArray[0] + 1
+                        column = locArray[1]
+                    return { line: line, column: column }
 
                 if node.loc?.start
-                  node.loc.start = mappedLocation(node.loc.start)
+                    node.loc.start = mappedLocation(node.loc.start)
                 if node.loc?.end
-                  node.loc.end = mappedLocation(node.loc.end)
+                    node.loc.end = mappedLocation(node.loc.end)
                 return
 
 module.exports = Instrumenter
