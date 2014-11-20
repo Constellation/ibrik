@@ -29,6 +29,13 @@ PromisedFS = require('promised-io/fs')
 child_process = require 'child_process'
 path = require 'path'
 
+adjustPath = (coverage) ->
+    result = {}
+    for key, value of coverage
+        result[path.relative('.', key)] = value
+        value.path = path.relative('.', value.path)
+    return result
+
 generateCoverage = (file) ->
     new Promise (resolve, reject) ->
         proc = child_process.spawn 'node', [
@@ -50,10 +57,7 @@ generateCoverage = (file) ->
                 PromisedFS.readFile("tmp/#{file}/coverage.json", 'utf-8')
                 .then((text) ->
                     # Adjust absolute path in coverage.json file.
-                    actual = JSON.parse text
-                    actual = property for name, property of actual
-                    actual.path = path.relative '.', actual.path
-                    return actual
+                    adjustPath JSON.parse text
                 ),
                 # expected
                 PromisedFS.readFile("#{file}.json", 'utf-8')
@@ -74,6 +78,9 @@ describe 'coverage', ->
 
     it 'simple#2', (done) ->
         coverTest('test/fixture/test002.coffee').then(done, done)
+
+    it 'require#1', (done) ->
+        coverTest('test/fixture/test003.coffee').then(done, done)
 
     it 'complicated', (done) ->
         coverTest('test/fixture/third_party/StringScannerWithTest.coffee').then(done, done)
