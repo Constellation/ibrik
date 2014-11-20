@@ -1,5 +1,10 @@
 ## Ibrik - CoffeeScript meets Istanbul
 
+[![Build Status](https://travis-ci.org/Constellation/ibrik.svg?branch=master)](https://travis-ci.org/Constellation/ibrik)
+[![Dependency Status](https://david-dm.org/Constellation/ibrik.svg)](https://david-dm.org/Constellation/ibrik)
+[![devDependency Status](https://david-dm.org/Constellation/ibrik/dev-status.svg)](https://david-dm.org/Constellation/ibrik#info=devDependencies)
+
+
 Ibrik ([ibrik](http://github.com/Constellation/ibrik)) is
 code coverage tool for CoffeeScript.
 It uses [istanbul](https://github.com/gotwarlost/istanbul) and CoffeeScript sourceMaps. Internally, it uses Mozilla JS AST as its IR.
