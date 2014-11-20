@@ -20,11 +20,14 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-coffee = require 'coffee-script-redux'
+coffee = require 'coffee-script'
 istanbul = require 'istanbul'
 escodegen = require 'escodegen'
 estraverse = require 'estraverse'
 _ = require 'lodash'
+esprima = require 'esprima'
+path = require 'path'
+fs = require 'fs'
 
 class StructuredCode
     constructor: (code) ->
@@ -66,12 +69,28 @@ class Instrumenter extends istanbul.Instrumenter
 
         throw new Error 'Code must be string' unless typeof code is 'string'
 
-        csast = coffee.parse code, optimise: no, raw: yes
-        program = coffee.compile csast, bare: yes
-        @fixupLoc program, code
-        @instrumentASTSync program, filename, code
+        try
+          code = coffee.compile code, sourceMap: true
+          program = esprima.parse(code.js, loc: true)
+          @fixupLoc program, code.sourceMap
+          @instrumentASTSync program, filename, code
+        catch e
+          e.message = "Error compiling #{filename}: #{e.message}"
+          throw e
 
-    fixupLoc: (program)->
+    # Used to ensure that a module is included in the code coverage report
+    # (even if it is not loaded during the test)
+    include: (filename) ->
+        filename = path.resolve(filename)
+        code = fs.readFileSync(filename, 'utf8')
+        @instrumentSync(code, filename)
+
+        # Setup istanbul's references for this module
+        eval("#{@getPreamble null}")
+
+        return
+
+    fixupLoc: (program, sourceMap)->
         # TODO(Constellation)
         # calculate precise offset or attach in
         # CoffeeScriptRedux compiler
@@ -81,39 +100,21 @@ class Instrumenter extends istanbul.Instrumenter
         structured = new StructuredCode(program.raw)
         estraverse.traverse program,
             leave: (node, parent) ->
-                if node.range?
-                    # calculate start line & column
-                    loc =
-                        start: null
-                        end: structured.loc(node.range[1])
-                    if node.loc?
-                        loc.start = node.loc.start
-                    else
-                        loc.start = structured.loc(node.range[0])
-                    node.loc = loc
-                else
-                    node.loc = switch node.type
-                        when 'BlockStatement'
-                            if node.body.length
-                                start: node.body[0].loc.start
-                                end: node.body[node.body.length - 1].loc.end
-                            else
-                                notFound
-                        when 'VariableDeclarator'
-                            if node?.init?.loc?
-                                start: node.id.loc.start
-                                end: node.init.loc.end
-                            else
-                                node.id.loc
-                        when 'ExpressionStatement'
-                            node.expression.loc
-                        when 'ReturnStatement'
-                            if node.argument? then node.argument.loc else node.loc
-                        when 'VariableDeclaration'
-                            start: node.declarations[0].loc.start
-                            end: node.declarations[node.declarations.length - 1].loc.end
-                        else
-                            notFound
+                mappedLocation = (location) ->
+                  locArray = sourceMap.sourceLocation([
+                    location.line - 1,
+                    location.column])
+                  line = 0
+                  column = 0
+                  if locArray
+                    line = locArray[0] + 1
+                    column = locArray[1]
+                  return { line: line, column: column }
+
+                if node.loc?.start
+                  node.loc.start = mappedLocation(node.loc.start)
+                if node.loc?.end
+                  node.loc.end = mappedLocation(node.loc.end)
                 return
 
 module.exports = Instrumenter

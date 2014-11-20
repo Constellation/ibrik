@@ -24,7 +24,7 @@ fs = require 'fs'
 path = require 'path'
 child_process = require 'child_process'
 root = path.join __dirname, '..'
-coffee = require 'coffee-script-redux'
+coffee = require 'coffee-script'
 compiler = path.join(root, 'node_modules', '.bin', 'coffee')
 
 libdir = path.join root, '' + process.argv[2]

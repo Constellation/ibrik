@@ -5,6 +5,7 @@ LIBDIR = lib
 SRCDIR = src
 
 SRC = $(wildcard $(SRCDIR)/*.coffee)
+
 LIB = $(SRC:$(SRCDIR)/%.coffee=$(LIBDIR)/%.js)
 
 .SUFFIXES: .coffee .js
@@ -19,7 +20,7 @@ $(LIBDIR):
 	@mkdir -p "$@"
 
 $(LIBDIR)/%.js: $(SRCDIR)/%.coffee $(LIBDIR)
-	$(COFFEE) -j < "$<" > "$@"
+	$(COFFEE) -s -p < "$<" > "$@"
 
 clean:
 	@rm -r $(LIBDIR)
