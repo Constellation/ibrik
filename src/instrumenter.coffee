@@ -63,7 +63,7 @@ class Instrumenter extends istanbul.Instrumenter
 
         return
 
-    fixupLoc: (program, sourceMap)->
+    fixupLoc: (program, sourceMap) ->
         estraverse.traverse program,
             leave: (node, parent) ->
                 mappedLocation = (location) ->

@@ -110,16 +110,16 @@ module.exports = (opts, callback) ->
             return callback(null, cov)
 
         if opts?.files?.include
-          if typeof opts.files.include is 'string'
-            # Handle single value case
-            opts.files.include = [opts.files.include]
-          fileset opts.files.include.join(' '), excludes.join(' '), (err, files) ->
-            if err
-              console.error 'Error including files: ', err
-            else
-              instrumenter.include(filename) for filename in files
-              do runFn
+            if typeof opts.files.include is 'string'
+                # Handle single value case
+                opts.files.include = [opts.files.include]
+            fileset opts.files.include.join(' '), excludes.join(' '), (err, files) ->
+                if err
+                    console.error 'Error including files: ', err
+                else
+                    instrumenter.include(filename) for filename in files
+                    do runFn
         else
-          do runFn
+            do runFn
 
 # vim: set sw=4 ts=4 et tw=80 :

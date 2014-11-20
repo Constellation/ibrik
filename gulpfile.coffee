@@ -24,6 +24,7 @@
 gulp   = require 'gulp'
 coffee = require 'gulp-coffee'
 mocha  = require 'gulp-mocha'
+coffeelint = require 'gulp-coffeelint'
 require 'coffee-script/register'
 
 SOURCE = [
@@ -54,5 +55,11 @@ gulp.task 'test', ->
         reporter: 'spec',
         timeout: 100000
     ))
+
+
+gulp.task 'lint', ->
+    gulp.src(SOURCE)
+    .pipe(coffeelint('coffeelint.json'))
+    .pipe(coffeelint.reporter())
 
 # vim: set sw=4 ts=4 et tw=80 :
