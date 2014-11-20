@@ -29,7 +29,7 @@ PromisedFS = require('promised-io/fs')
 child_process = require 'child_process'
 path = require 'path'
 
-coverTest = (file) ->
+generateCoverage = (file) ->
     new Promise (resolve, reject) ->
         proc = child_process.spawn 'node', [
             'bin/ibrik'
@@ -50,23 +50,18 @@ coverTest = (file) ->
                 PromisedFS.readFile("#{file}.json", 'utf-8')
             ]))
 
+coverTest = (file) ->
+    generateCoverage(file).then ([actual, expected]) ->
+        expect(JSON.parse(expected)).to.deep.equal JSON.parse(actual)
+        return null
 
 describe 'coverage', ->
-    it 'simple', (done) ->
-        coverTest('test/fixture/test001.coffee')
-            .then(([actual, expected]) ->
-                actual = property for name, property of JSON.parse actual
-                actual.path = path.relative '.', actual.path
-                expect(JSON.parse(expected)).to.eql actual
-                do done
-            )
-            .catch(done)
+    it 'simple#1', (done) ->
+        coverTest('test/fixture/test001.coffee').then(done, done)
+
+    it 'simple#2', (done) ->
+        coverTest('test/fixture/test002.coffee').then(done, done)
 
     it 'complicated', (done) ->
-        coverTest('test/fixture/third_party/StringScannerWithTest.coffee')
-            .then(([actual, expected]) ->
-                expect(JSON.parse(expected)).to.eql JSON.parse(actual)
-                do done
-            )
-            .catch(done)
+        coverTest('test/fixture/third_party/StringScannerWithTest.coffee').then(done, done)
 
