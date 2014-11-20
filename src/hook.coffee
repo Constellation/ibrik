@@ -46,7 +46,6 @@ transformFn = (matcher, transformer, verbose) ->
                 console.error 'Transformation error; return original code'
                 console.error ex.stack
                 console.error ex
-                console.error ex.stack
                 transformed = code
         else
             transformed = code
@@ -75,19 +74,19 @@ hook.hookRequire = (matcher, transformer, options = {}) ->
         # our loader for .coffee is trounced.  I'm not happy about this, but
         # suppress re-loading coffee-script here
         if not endsWith(filename, 'coffee-script.js')
-          originalJSLoader module, filename
+            originalJSLoader module, filename
         return
 
 hook.unhookRequire = ->
     if originalJSLoader
-      require.extensions['.js'] = originalJSLoader
-      originalJSLoader = null
+        require.extensions['.js'] = originalJSLoader
+        originalJSLoader = null
     do istanbul.hook.unhookRequire
     require.extensions['.coffee'] = originalLoader
 
 endsWith = (string, endString) ->
-  return false if string.length < endString.length
-  return string.substr(string.length - endString.length) is endString
-      
+    return false if string.length < endString.length
+    return string.substr(string.length - endString.length) is endString
+
 module.exports = hook
 # vim: set sw=4 ts=4 et tw=80 :

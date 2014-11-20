@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "lodash": "~2.4.1",
-    "coffee-script": "~ 1.7.0",
+    "coffee-script": "~1.7.0",
     "istanbul": "~0.2.4",
     "estraverse": "~1.5.0",
     "escodegen": "~1.1.0",
@@ -38,10 +38,12 @@
     "fileset": "0.1.x"
   },
   "devDependencies": {
+    "bluebird": "~1.0.3",
     "chai": "~1.9.0",
+    "gulp": "^3.8.10",
+    "gulp-coffee": "^2.2.0",
     "mocha": "~1.17.1",
-    "promised-io": "~0.3.4",
-    "bluebird": "~1.0.3"
+    "promised-io": "~0.3.4"
   },
   "licenses": [
     {
@@ -51,8 +53,8 @@
   ],
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script/register",
-    "build": "make build",
-    "watch": "make watch",
-    "release": "npm run-script build && npm publish ."
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "release": "npm run build && npm publish ."
   }
 }
