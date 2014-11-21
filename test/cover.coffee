@@ -23,11 +23,11 @@
 'use strict'
 
 fs = require 'fs'
-expect = require('chai').expect
-Promise = require('bluebird')
-PromisedFS = require('promised-io/fs')
-child_process = require 'child_process'
 path = require 'path'
+child_process = require 'child_process'
+expect = require('chai').expect
+chalk = require 'chalk'
+Promise = require('bluebird')
 
 adjustPath = (coverage) ->
     result = {}
@@ -38,6 +38,7 @@ adjustPath = (coverage) ->
 
 generateCoverage = (file) ->
     new Promise (resolve, reject) ->
+        readFile = Promise.promisify fs.readFile
         proc = child_process.spawn 'node', [
             'bin/ibrik'
             'cover'
@@ -52,15 +53,29 @@ generateCoverage = (file) ->
         proc.on 'exit', (code) ->
             return reject code if code
 
+            # actual
+            actualPath = "tmp/#{file}/coverage.json"
+            actual = readFile(actualPath, 'utf-8')
+            .then((text) ->
+                # Adjust absolute path in coverage.json file.
+                adjustPath JSON.parse text
+            )
+
+            expectedPath = "#{file}.json"
+
             resolve(Promise.all([
-                # actual
-                PromisedFS.readFile("tmp/#{file}/coverage.json", 'utf-8')
-                .then((text) ->
-                    # Adjust absolute path in coverage.json file.
-                    adjustPath JSON.parse text
-                ),
+                actual,
                 # expected
-                PromisedFS.readFile("#{file}.json", 'utf-8')
+                readFile(expectedPath, 'utf-8')
+                .catch((error) ->
+                    if  error?.cause?.code is 'ENOENT'
+                        actual.then (data) ->
+                            console.error chalk.yellow('Missing expected file. Dumping the actual result as the expected file.')
+                            Promise.promisify(fs.writeFile)(expectedPath, JSON.stringify(data), 'utf-8').then ->
+                                Promise.reject(error)
+                    else
+                        Promise.reject(error)
+                )
                 .then((text) ->
                     # Expected file should not contain absolute path.
                     return JSON.parse text
@@ -68,7 +83,8 @@ generateCoverage = (file) ->
             ]))
 
 coverTest = (file) ->
-    generateCoverage(file).then ([actual, expected]) ->
+    generateCoverage(file)
+    .then ([actual, expected]) ->
         expect(expected).to.deep.equal actual
         return null
 
@@ -81,6 +97,9 @@ describe 'coverage', ->
 
     it 'require#1', (done) ->
         coverTest('test/fixture/test003.coffee').then(done, done)
+
+    it 'issue#21', (done) ->
+        coverTest('test/fixture/issue21.coffee').then(done, done)
 
     it 'complicated', (done) ->
         coverTest('test/fixture/third_party/StringScannerWithTest.coffee').then(done, done)
