@@ -57,8 +57,12 @@ module.exports = (opts, callback) ->
 
     mkdirp.sync reportingDir
 
-    reportClassName = opts.report or DEFAULT_REPORT_FORMAT
-    reports = [(istanbul.Report.create reportClassName, dir: reportingDir)]
+    reportClassNames = opts.report or DEFAULT_REPORT_FORMAT
+    reports =
+        if Array.isArray reportClassNames
+            reportClassNames.map (reportClassName) -> istanbul.Report.create(reportClassName, dir: reportingDir)
+        else
+            [ istanbul.Report.create(reportClassNames, dir: reportingDir) ]
 
     runFn = ->
         process.argv = ['node', file, args...]
