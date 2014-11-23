@@ -98,6 +98,9 @@ describe 'coverage', ->
     it 'require#1', (done) ->
         coverTest('test/fixture/test003.coffee').then(done, done)
 
+    it 'issue#20', (done) ->
+        coverTest('test/fixture/issue20.coffee').then(done, done)
+
     it 'issue#21', (done) ->
         coverTest('test/fixture/issue21.coffee').then(done, done)
 
