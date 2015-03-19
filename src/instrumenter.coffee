@@ -44,7 +44,7 @@ class Instrumenter extends istanbul.Instrumenter
         throw new Error 'Code must be string' unless typeof code is 'string'
 
         try
-            code = coffee.compile code, sourceMap: true
+            code = coffee.compile code, sourceMap: true, bare: true
             program = esprima.parse(code.js, loc: true)
             @fixupLoc program, code.sourceMap
             @instrumentASTSync program, filename, code
