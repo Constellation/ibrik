@@ -45,7 +45,13 @@ class Instrumenter extends istanbul.Instrumenter
 
         try
             code = coffee.compile code, sourceMap: true
-            program = esprima.parse(code.js, loc: true)
+            program = esprima.parse(code.js, {
+                loc: true
+                range: true
+                raw: true
+                tokens: true
+                comment: true
+            })
             @fixupLoc program, code.sourceMap
             @instrumentASTSync program, filename, code
         catch e

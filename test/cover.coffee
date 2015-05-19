@@ -107,3 +107,5 @@ describe 'coverage', ->
     it 'complicated', (done) ->
         coverTest('test/fixture/third_party/StringScannerWithTest.coffee').then(done, done)
 
+    it 'ignore comment', (done) ->
+        coverTest('test/fixture/comment.coffee').then(done, done)
