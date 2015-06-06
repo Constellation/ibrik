@@ -57,7 +57,7 @@ if command not in COMMANDS
             process.exit 1
 
 
-(require "./#{command}") argv, (err,cov,exitCode=0) ->
+(require "./#{command}") argv, (err,cov,exitCode = 0) ->
     if err
         console.error err
         process.exit 1

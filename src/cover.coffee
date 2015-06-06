@@ -96,7 +96,7 @@ module.exports = (opts, callback) ->
 
         ibrik.hook.hookRequire matchFn, transformer, hookOpts
 
-        process.once 'exit', (exitCode)->
+        process.once 'exit', (exitCode) ->
             file = path.resolve reportingDir, 'coverage.json'
             if not global[coverageVar]?
                 return callback('No coverage information was collected, exit without writing coverage information', null, exitCode)

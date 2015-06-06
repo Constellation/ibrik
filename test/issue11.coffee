@@ -27,7 +27,6 @@ describe 'issue#11',->
     command+= ' test/fixture/issue11.coffee '
     command+= ' --reporter spec'
     command+= ' --recursive test'
-    command+= ' --compilers coffee:coffee-script/register'
 
     $ibrik command
     .then (stdout)->
