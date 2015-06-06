@@ -57,9 +57,9 @@ if command not in COMMANDS
             process.exit 1
 
 
-(require "./#{command}") argv, (err) ->
+(require "./#{command}") argv, (err,cov,exitCode=0) ->
     if err
         console.error err
         process.exit 1
-    process.exit 0
+    process.exit exitCode
 # vim: set sw=4 ts=4 et tw=80 :

@@ -96,10 +96,10 @@ module.exports = (opts, callback) ->
 
         ibrik.hook.hookRequire matchFn, transformer, hookOpts
 
-        process.once 'exit', ->
+        process.once 'exit', (exitCode)->
             file = path.resolve reportingDir, 'coverage.json'
             if not global[coverageVar]?
-                return callback('No coverage information was collected, exit without writing coverage information', null)
+                return callback('No coverage information was collected, exit without writing coverage information', null, exitCode)
             else
                 cov = global[coverageVar]
 
@@ -112,7 +112,7 @@ module.exports = (opts, callback) ->
             console.log "Writing coverage reports at [#{reportingDir}]"
             console.log '============================================================================='
             report.writeReport collector, yes for report in reports
-            return callback(null, cov)
+            return callback(null, cov, exitCode)
 
         if opts?.files?.include
             if typeof opts.files.include is 'string'
