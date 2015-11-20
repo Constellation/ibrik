@@ -28,6 +28,7 @@ _ = require 'lodash'
 esprima = require 'esprima'
 path = require 'path'
 fs = require 'fs'
+clean = require './clean'
 
 # Use ECMAScript 5.1th indirect call to eval instead of direct eval call.
 globalEval = (source) ->
@@ -45,6 +46,7 @@ class Instrumenter extends istanbul.Instrumenter
 
         try
             code = coffee.compile code, sourceMap: true
+            code.js = clean code.js
             program = esprima.parse(code.js, {
                 loc: true
                 range: true
