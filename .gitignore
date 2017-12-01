@@ -12,3 +12,4 @@ cover_html/
 npm-debug.log
 
 lib/
+tmp/
