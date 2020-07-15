@@ -31,7 +31,7 @@
     "estraverse": "^1.9.0",
     "fileset": "0.1.x",
     "istanbul": "~0.3.2",
-    "lodash": "~2.4.1",
+    "lodash": "~4.17.19",
     "mkdirp": "~0.5.0",
     "optimist": "~0.6.1",
     "which": "~1.0.5"
